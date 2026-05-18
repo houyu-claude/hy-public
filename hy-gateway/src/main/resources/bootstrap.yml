@@ -1,0 +1,54 @@
+spring:
+  application:
+    name: hy-gateway
+  cloud:
+    nacos:
+      discovery:
+        server-addr: ${NACOS_SERVER_ADDR:localhost:8848}
+        namespace: ${NACOS_NAMESPACE:public}
+      config:
+        server-addr: ${NACOS_SERVER_ADDR:localhost:8848}
+        namespace: ${NACOS_NAMESPACE:public}
+        group: DEFAULT_GROUP
+        file-extension: yaml
+        extension-configs:
+          - data-id: gateway-routes
+            group: DEFAULT_GROUP
+            refresh: true
+
+server:
+  port: 8080
+
+hy:
+  log:
+    enabled: true
+  gateway:
+    rate-limit:
+      ip-limit: 100
+      user-limit: 50
+      uri-limit: 500
+    whitelist:
+      paths:
+        - /api/public/**
+        - /api/auth/login
+        - /health
+
+spring:
+  cloud:
+    gateway:
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowed-origins:
+              - http://localhost:3000
+              - https://*.houyu.com
+            allowed-methods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+            allowed-headers:
+              - '*'
+            allow-credentials: true
+            max-age: 3600
