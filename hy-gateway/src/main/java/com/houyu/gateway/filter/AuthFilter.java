@@ -1,6 +1,7 @@
 package com.houyu.gateway.filter;
 
 import com.houyu.gateway.config.WhitelistProperties;
+import com.houyu.gateway.exception.GatewayException;
 import com.houyu.gateway.service.AuthService;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
@@ -39,8 +40,12 @@ public class AuthFilter implements GlobalFilter, Ordered {
 
         try {
             authService.checkPermission(userId, uri, method);
+        } catch (GatewayException e) {
+            HttpStatus status = mapCodeToStatus(e.getCode());
+            exchange.getResponse().setStatusCode(status);
+            return exchange.getResponse().setComplete();
         } catch (Exception e) {
-            exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
+            exchange.getResponse().setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR);
             return exchange.getResponse().setComplete();
         }
 
@@ -53,6 +58,16 @@ public class AuthFilter implements GlobalFilter, Ordered {
             return false;
         }
         return whitelist.stream().anyMatch(path::startsWith);
+    }
+
+    private HttpStatus mapCodeToStatus(String code) {
+        return switch (code) {
+            case "TOKEN_MISSING", "TOKEN_INVALID", "UNAUTHORIZED" -> HttpStatus.UNAUTHORIZED;
+            case "FORBIDDEN" -> HttpStatus.FORBIDDEN;
+            case "RATE_LIMIT_IP", "RATE_LIMIT_USER", "RATE_LIMIT_URI" -> HttpStatus.TOO_MANY_REQUESTS;
+            case "SERVICE_UNAVAILABLE" -> HttpStatus.SERVICE_UNAVAILABLE;
+            default -> HttpStatus.BAD_REQUEST;
+        };
     }
 
     @Override

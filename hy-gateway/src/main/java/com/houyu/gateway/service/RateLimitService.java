@@ -1,49 +1,51 @@
 package com.houyu.gateway.service;
 
-import com.alicp.jetcache.Cache;
-import com.alicp.jetcache.anno.CacheType;
-import com.alicp.jetcache.anno.CreateCache;
+import com.houyu.gateway.config.GatewayProperties;
 import com.houyu.gateway.exception.GatewayException;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 public class RateLimitService {
 
-    @CreateCache(name = "gateway:ratelimit:",
-                 cacheType = CacheType.REMOTE,
-                 expire = 60,
-                 timeUnit = TimeUnit.SECONDS)
-    private Cache<String, AtomicInteger> rateLimitCache;
+    private final StringRedisTemplate redisTemplate;
+    private final GatewayProperties gatewayProperties;
+
+    public RateLimitService(StringRedisTemplate redisTemplate, GatewayProperties gatewayProperties) {
+        this.redisTemplate = redisTemplate;
+        this.gatewayProperties = gatewayProperties;
+    }
 
     public boolean tryAcquire(String key, int limit, int windowSeconds) {
-        AtomicInteger counter = rateLimitCache.computeIfAbsent(key, k -> new AtomicInteger(0));
+        String redisKey = "gateway:ratelimit:" + key;
         
-        int current = counter.incrementAndGet();
+        Long current = redisTemplate.opsForValue().increment(redisKey);
         
         if (current == 1) {
-            rateLimitCache.expire(key, windowSeconds, TimeUnit.SECONDS);
+            redisTemplate.expire(redisKey, windowSeconds, TimeUnit.SECONDS);
         }
         
-        return current <= limit;
+        return current != null && current <= limit;
     }
 
     public void checkRateLimit(String clientIp, String userId, String uri) {
+        GatewayProperties.RateLimit rateLimit = gatewayProperties.getRateLimit();
+        
         String ipKey = "ip:" + clientIp;
         String userKey = userId != null ? "user:" + userId : null;
         String uriKey = "uri:" + uri;
 
-        if (!tryAcquire(ipKey, 100, 60)) {
+        if (!tryAcquire(ipKey, rateLimit.getIpLimit(), 60)) {
             throw new GatewayException("RATE_LIMIT_IP", "IP rate limit exceeded");
         }
 
-        if (userKey != null && !tryAcquire(userKey, 50, 60)) {
+        if (userKey != null && !tryAcquire(userKey, rateLimit.getUserLimit(), 60)) {
             throw new GatewayException("RATE_LIMIT_USER", "User rate limit exceeded");
         }
 
-        if (!tryAcquire(uriKey, 500, 60)) {
+        if (!tryAcquire(uriKey, rateLimit.getUriLimit(), 60)) {
             throw new GatewayException("RATE_LIMIT_URI", "URI rate limit exceeded");
         }
     }

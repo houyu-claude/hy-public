@@ -15,26 +15,6 @@ spring:
           - data-id: gateway-routes
             group: DEFAULT_GROUP
             refresh: true
-
-server:
-  port: 8080
-
-hy:
-  log:
-    enabled: true
-  gateway:
-    rate-limit:
-      ip-limit: 100
-      user-limit: 50
-      uri-limit: 500
-    whitelist:
-      paths:
-        - /api/public/**
-        - /api/auth/login
-        - /health
-
-spring:
-  cloud:
     gateway:
       globalcors:
         cors-configurations:
@@ -52,3 +32,22 @@ spring:
               - '*'
             allow-credentials: true
             max-age: 3600
+
+server:
+  port: 8080
+
+hy:
+  log:
+    enabled: true
+  gateway:
+    jwt:
+      secret: ${JWT_SECRET:houyu-gateway-secret-key-2026}
+    rate-limit:
+      ip-limit: 100
+      user-limit: 50
+      uri-limit: 500
+    whitelist:
+      paths:
+        - /api/public/**
+        - /api/auth/login
+        - /health
