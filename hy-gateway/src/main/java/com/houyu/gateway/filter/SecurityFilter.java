@@ -1,9 +1,9 @@
 package com.houyu.gateway.filter;
 
+import com.houyu.gateway.exception.GatewayException;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.core.Ordered;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
@@ -29,13 +29,11 @@ public class SecurityFilter implements GlobalFilter, Ordered {
         String path = exchange.getRequest().getPath().value();
 
         if (containsXss(queryString) || containsXss(path)) {
-            exchange.getResponse().setStatusCode(HttpStatus.BAD_REQUEST);
-            return exchange.getResponse().setComplete();
+            throw new GatewayException("XSS_ATTACK", "XSS attack detected");
         }
 
         if (containsSqlInjection(queryString) || containsSqlInjection(path)) {
-            exchange.getResponse().setStatusCode(HttpStatus.BAD_REQUEST);
-            return exchange.getResponse().setComplete();
+            throw new GatewayException("SQL_INJECTION", "SQL injection detected");
         }
 
         return chain.filter(exchange);

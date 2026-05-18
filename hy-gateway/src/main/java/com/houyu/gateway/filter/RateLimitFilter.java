@@ -5,7 +5,6 @@ import com.houyu.gateway.util.IpUtils;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.core.Ordered;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
@@ -27,12 +26,7 @@ public class RateLimitFilter implements GlobalFilter, Ordered {
         String userId = exchange.getRequest().getHeaders().getFirst(USER_ID_HEADER);
         String uri = exchange.getRequest().getPath().value();
 
-        try {
-            rateLimitService.checkRateLimit(clientIp, userId, uri);
-        } catch (Exception e) {
-            exchange.getResponse().setStatusCode(HttpStatus.TOO_MANY_REQUESTS);
-            return exchange.getResponse().setComplete();
-        }
+        rateLimitService.checkRateLimit(clientIp, userId, uri);
 
         return chain.filter(exchange);
     }

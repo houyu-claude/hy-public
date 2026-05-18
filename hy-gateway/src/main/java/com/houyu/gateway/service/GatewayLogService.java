@@ -5,8 +5,6 @@ import com.houyu.common.log.model.HttpRequestInfo;
 import com.houyu.common.log.model.HttpResponseInfo;
 import com.houyu.common.log.output.LogOutputManager;
 import com.houyu.common.log.trace.TraceContextHolder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -15,8 +13,6 @@ import java.util.Map;
 
 @Service
 public class GatewayLogService {
-
-    private static final Logger logger = LoggerFactory.getLogger(GatewayLogService.class);
 
     private final LogOutputManager logOutputManager;
 
@@ -40,8 +36,6 @@ public class GatewayLogService {
         logEvent.setHttpRequest(httpRequest);
         
         logOutputManager.output(logEvent);
-        
-        logger.info("Gateway request - {} {} from {}", method, uri, clientIp);
     }
 
     public void logResponse(int statusCode, String responseBody, long executionTime) {
@@ -57,8 +51,6 @@ public class GatewayLogService {
         logEvent.setHttpResponse(httpResponse);
         
         logOutputManager.output(logEvent);
-        
-        logger.info("Gateway response - status: {}, time: {}ms", statusCode, executionTime);
     }
 
     private HyLogEvent createLogEvent() {

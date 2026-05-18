@@ -1,6 +1,7 @@
 package com.houyu.gateway.exception;
 
 import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.core.Ordered;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.server.reactive.ServerHttpResponse;
@@ -15,7 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Component
-public class GatewayExceptionHandler implements WebExceptionHandler {
+public class GatewayExceptionHandler implements WebExceptionHandler, Ordered {
 
     private final ObjectMapper objectMapper;
 
@@ -59,7 +60,13 @@ public class GatewayExceptionHandler implements WebExceptionHandler {
             case "FORBIDDEN" -> HttpStatus.FORBIDDEN;
             case "RATE_LIMIT_IP", "RATE_LIMIT_USER", "RATE_LIMIT_URI" -> HttpStatus.TOO_MANY_REQUESTS;
             case "SERVICE_UNAVAILABLE" -> HttpStatus.SERVICE_UNAVAILABLE;
+            case "XSS_ATTACK", "SQL_INJECTION" -> HttpStatus.BAD_REQUEST;
             default -> HttpStatus.BAD_REQUEST;
         };
+    }
+
+    @Override
+    public int getOrder() {
+        return Ordered.HIGHEST_PRECEDENCE;
     }
 }
