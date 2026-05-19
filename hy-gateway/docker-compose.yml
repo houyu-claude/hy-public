@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  hy-gateway:
+    build: .
+    container_name: hy-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      - NACOS_SERVER_ADDR=localhost:8848
+      - NACOS_NAMESPACE=public
+      - REDIS_HOST=localhost
+      - REDIS_PORT=63790
+      - REDIS_DB=0
+      - JWT_SECRET=houyu-gateway-secret-key-2026
+    depends_on:
+      - redis
+
+  redis:
+    image: redis:7.2-alpine
+    container_name: hy-gateway-redis
+    ports:
+      - "63790:6379"
+    volumes:
+      - redis-data:/data
+
+volumes:
+  redis-data:
