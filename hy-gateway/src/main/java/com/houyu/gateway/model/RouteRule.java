@@ -47,32 +47,6 @@ public class RouteRule {
         
         definition.setOrder(this.order != null ? this.order : 0);
         
-        List<PredicateDefinition> safePredicates = this.predicates != null ? this.predicates : Collections.emptyList();
-        safePredicates.forEach(predicate -> {
-            if (predicate != null && predicate.getName() != null && !predicate.getName().isEmpty()) {
-                org.springframework.cloud.gateway.route.PredicateDefinition pd = 
-                        new org.springframework.cloud.gateway.route.PredicateDefinition();
-                pd.setName(predicate.getName());
-                if (predicate.getValue() != null) {
-                    pd.addArg("_genkey_0", predicate.getValue());
-                }
-                definition.getPredicates().add(pd);
-            }
-        });
-        
-        List<FilterDefinition> safeFilters = this.filters != null ? this.filters : Collections.emptyList();
-        safeFilters.forEach(filter -> {
-            if (filter != null && filter.getName() != null && !filter.getName().isEmpty()) {
-                org.springframework.cloud.gateway.route.FilterDefinition fd = 
-                        new org.springframework.cloud.gateway.route.FilterDefinition();
-                fd.setName(filter.getName());
-                if (filter.getValue() != null) {
-                    fd.addArg("_genkey_0", filter.getValue());
-                }
-                definition.getFilters().add(fd);
-            }
-        });
-        
         return definition;
     }
 }

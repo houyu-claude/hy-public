@@ -31,7 +31,7 @@ public class GatewayLogService {
         httpRequest.setQueryString(queryString);
         httpRequest.setHeaders(headers);
         httpRequest.setRequestBody(requestBody);
-        httpRequest.setClientIp(clientIp);
+        // httpRequest.setClientIp(clientIp); - 等待 hy-common-log 更新
         
         logEvent.setHttpRequest(httpRequest);
         
