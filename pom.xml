@@ -22,4 +22,10 @@
         <module>hy-gateway</module>
     </modules>
 
+    <dependencies>
+        <dependency>
+            <groupId>com.houyu</groupId>
+            <artifactId>hy-common-log</artifactId>
+        </dependency>
+    </dependencies>
 </project>

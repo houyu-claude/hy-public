@@ -6,7 +6,7 @@
 
     <parent>
         <groupId>com.houyu</groupId>
-        <artifactId>hy-common-log</artifactId>
+        <artifactId>hy-public</artifactId>
         <version>1.0.0-SNAPSHOT</version>
     </parent>
 
@@ -29,7 +29,7 @@
 
         <dependency>
             <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-gateway</artifactId>
+            <artifactId>spring-cloud-starter-gateway-server-webflux</artifactId>
         </dependency>
 
         <dependency>
@@ -45,11 +45,6 @@
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-loadbalancer</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-openfeign</artifactId>
         </dependency>
 
         <dependency>
@@ -74,11 +69,6 @@
             <artifactId>jjwt-jackson</artifactId>
             <version>${jjwt.version}</version>
             <scope>runtime</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>com.houyu</groupId>
-            <artifactId>hy-common-log</artifactId>
         </dependency>
 
         <dependency>
