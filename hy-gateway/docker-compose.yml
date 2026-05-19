@@ -17,7 +17,7 @@ services:
       - redis
 
   redis:
-    image: redis:7.2-alpine
+    image: redis:8.6-alpine
     container_name: hy-gateway-redis
     ports:
       - "63790:6379"
